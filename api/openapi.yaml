@@ -1,0 +1,279 @@
+openapi: 3.1.0
+info:
+  title: Storage API
+  version: 0.1.0
+  description: Internal file storage service.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+tags:
+  - name: Files
+  - name: Directories
+  - name: Storage
+paths:
+  /files:
+    get:
+      tags: [Files]
+      operationId: listFiles
+      summary: List files in a directory
+      parameters:
+        - name: directoryId
+          in: query
+          description: Omit for root directory
+          schema: { type: string, format: uuid }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 100, minimum: 1, maximum: 1000 }
+        - name: offset
+          in: query
+          schema: { type: integer, default: 0, minimum: 0 }
+      responses:
+        "200":
+          description: Directory contents
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileListResponse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      tags: [Files]
+      operationId: uploadFile
+      summary: Upload a file
+      parameters:
+        - name: X-File-Name
+          in: header
+          required: true
+          schema: { type: string }
+        - name: X-Directory-Id
+          in: header
+          schema: { type: string, format: uuid }
+        - name: X-Content-SHA256
+          in: header
+          description: Expected SHA-256 checksum in hexadecimal
+          schema: { type: string, pattern: "^[a-fA-F0-9]{64}$" }
+      requestBody:
+        required: true
+        content:
+          application/octet-stream: {}
+      responses:
+        "201":
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileMetadata" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "413": { description: File exceeds allowed size }
+        "422": { description: Checksum mismatch }
+        "507": { description: Insufficient storage space }
+  /files/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/FileId" }
+    get:
+      tags: [Files]
+      operationId: getFile
+      summary: Get file metadata
+      responses:
+        "200":
+          description: File metadata
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileMetadata" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Files]
+      operationId: updateFile
+      summary: Rename or move a file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateFileRequest" }
+      responses:
+        "200":
+          description: Updated file
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FileMetadata" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Files]
+      operationId: deleteFile
+      summary: Delete a file
+      responses:
+        "204": { description: File deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /files/{id}/content:
+    parameters:
+      - { $ref: "#/components/parameters/FileId" }
+    get:
+      tags: [Files]
+      operationId: downloadFile
+      summary: Download file content
+      responses:
+        "200":
+          description: Binary file content
+          headers:
+            Content-Disposition:
+              schema: { type: string }
+            Content-Length:
+              schema: { type: integer, format: int64 }
+          content:
+            application/octet-stream: {}
+        "404": { $ref: "#/components/responses/NotFound" }
+  /directories:
+    post:
+      tags: [Directories]
+      operationId: createDirectory
+      summary: Create a directory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateDirectoryRequest" }
+      responses:
+        "201":
+          description: Directory created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DirectoryMetadata" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /directories/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/DirectoryId" }
+    get:
+      tags: [Directories]
+      operationId: getDirectory
+      summary: Get directory metadata
+      responses:
+        "200":
+          description: Directory metadata
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DirectoryMetadata" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Directories]
+      operationId: updateDirectory
+      summary: Rename or move a directory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateFileRequest" }
+      responses:
+        "200":
+          description: Updated directory
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DirectoryMetadata" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Directories]
+      operationId: deleteDirectory
+      summary: Delete an empty directory
+      responses:
+        "204": { description: Directory deleted }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { description: Directory is not empty }
+  /storage:
+    get:
+      tags: [Storage]
+      operationId: getStorageInfo
+      summary: Get storage capacity and usage
+      responses:
+        "200":
+          description: Storage information
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StorageInfo" }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+  parameters:
+    FileId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    DirectoryId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  schemas:
+    FileMetadata:
+      type: object
+      required: [id, name, size, checksum, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        directoryId: { type: [string, "null"], format: uuid }
+        size: { type: integer, format: int64 }
+        contentType: { type: string }
+        checksum: { type: string, description: SHA-256 checksum in hexadecimal }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    FileListResponse:
+      type: object
+      required: [files, total]
+      properties:
+        files:
+          type: array
+          items: { $ref: "#/components/schemas/FileMetadata" }
+        total: { type: integer, format: int64 }
+    UpdateFileRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1 }
+        directoryId:
+          type: [string, "null"]
+          format: uuid
+          description: Null moves the item to root; omission leaves it unchanged.
+    CreateDirectoryRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        parentId: { type: [string, "null"], format: uuid }
+    DirectoryMetadata:
+      type: object
+      required: [id, name, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        parentId: { type: [string, "null"], format: uuid }
+        createdAt: { type: string, format: date-time }
+    StorageInfo:
+      type: object
+      required: [totalBytes, usedBytes, freeBytes]
+      properties:
+        totalBytes: { type: integer, format: int64 }
+        usedBytes: { type: integer, format: int64 }
+        freeBytes: { type: integer, format: int64 }
+    ErrorResponse:
+      type: object
+      required: [title, status, detail]
+      properties:
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ErrorResponse" }
