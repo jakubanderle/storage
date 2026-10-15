@@ -1,3 +1,6 @@
 spring:
   application:
     name: storage
+
+storage:
+  storagePath: C:/Users/Jakub/programy/oracle/storage/disc
