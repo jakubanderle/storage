@@ -9,14 +9,11 @@ import cz.kuba.storage.models.FileMetadataDTO;
 import cz.kuba.storage.services.FilesService;
 
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.UUID;
 
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
