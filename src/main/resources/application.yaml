@@ -1,6 +1,23 @@
 spring:
   application:
     name: storage
+  datasource:
+    url: jdbc:postgresql://localhost:5432/storage
+    username: storage
+    password: storage
 
-storage:
-  storagePath: C:/Users/Jakub/programy/oracle/storage/disc
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://localhost:5432/storage
+    user: storage_liquibase
+    password: liquibase
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  jooq:
+    sql-dialect: POSTGRES
+
+cz:
+  anderle:
+    mizar:
+      storage:
+        disc-path: "C:/Users/Jakub Anderle/programy/oracle/storage/disc"

@@ -2,19 +2,19 @@ openapi: 3.1.0
 info:
   title: Storage API
   version: 0.1.0
-  description: Internal file storage service.
+  description: Mizar file storage service.
 servers:
   - url: /api/v1
 security:
-  - bearerAuth: []
+  - bearerAuth: [ ]
 tags:
-  - name: Files
-  - name: Directories
+  - name: File
+  - name: Directory
   - name: Storage
 paths:
   /files:
     get:
-      tags: [Files]
+      tags: [ File ]
       operationId: listFiles
       summary: List files in a directory
       parameters:
@@ -36,7 +36,7 @@ paths:
               schema: { $ref: "#/components/schemas/FileListResponse" }
         "404": { $ref: "#/components/responses/NotFound" }
     post:
-      tags: [Files]
+      tags: [ File ]
       operationId: uploadFile
       summary: Upload a file
       parameters:
@@ -54,7 +54,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/octet-stream: {}
+          application/octet-stream: { }
       responses:
         "201":
           description: File uploaded successfully
@@ -70,7 +70,7 @@ paths:
     parameters:
       - { $ref: "#/components/parameters/FileId" }
     get:
-      tags: [Files]
+      tags: [ File ]
       operationId: getFile
       summary: Get file metadata
       responses:
@@ -81,14 +81,14 @@ paths:
               schema: { $ref: "#/components/schemas/FileMetadata" }
         "404": { $ref: "#/components/responses/NotFound" }
     patch:
-      tags: [Files]
+      tags: [ File ]
       operationId: updateFile
       summary: Rename or move a file
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/UpdateFileRequest" }
+            schema: { $ref: "#/components/schemas/UpdateItemRequest" }
       responses:
         "200":
           description: Updated file
@@ -98,7 +98,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
     delete:
-      tags: [Files]
+      tags: [ File ]
       operationId: deleteFile
       summary: Delete a file
       responses:
@@ -108,7 +108,7 @@ paths:
     parameters:
       - { $ref: "#/components/parameters/FileId" }
     get:
-      tags: [Files]
+      tags: [ File ]
       operationId: downloadFile
       summary: Download file content
       responses:
@@ -120,11 +120,11 @@ paths:
             Content-Length:
               schema: { type: integer, format: int64 }
           content:
-            application/octet-stream: {}
+            application/octet-stream: { }
         "404": { $ref: "#/components/responses/NotFound" }
   /directories:
     post:
-      tags: [Directories]
+      tags: [ Directory ]
       operationId: createDirectory
       summary: Create a directory
       requestBody:
@@ -143,7 +143,7 @@ paths:
     parameters:
       - { $ref: "#/components/parameters/DirectoryId" }
     get:
-      tags: [Directories]
+      tags: [ Directory ]
       operationId: getDirectory
       summary: Get directory metadata
       responses:
@@ -154,14 +154,14 @@ paths:
               schema: { $ref: "#/components/schemas/DirectoryMetadata" }
         "404": { $ref: "#/components/responses/NotFound" }
     patch:
-      tags: [Directories]
+      tags: [ Directory ]
       operationId: updateDirectory
       summary: Rename or move a directory
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/UpdateFileRequest" }
+            schema: { $ref: "#/components/schemas/UpdateItemRequest" }
       responses:
         "200":
           description: Updated directory
@@ -171,7 +171,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409": { $ref: "#/components/responses/Conflict" }
     delete:
-      tags: [Directories]
+      tags: [ Directory ]
       operationId: deleteDirectory
       summary: Delete an empty directory
       responses:
@@ -180,7 +180,7 @@ paths:
         "409": { description: Directory is not empty }
   /storage:
     get:
-      tags: [Storage]
+      tags: [ Storage ]
       operationId: getStorageInfo
       summary: Get storage capacity and usage
       responses:
@@ -204,59 +204,83 @@ components:
       required: true
       schema: { type: string, format: uuid }
   schemas:
+    Metadata:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 2000
+        tags:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+            maxLength: 100
+        custom:
+          type: object
+          additionalProperties: true
     FileMetadata:
       type: object
-      required: [id, name, size, checksum, createdAt]
+      required: [ id, name, size, checksum, createdAt ]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        directoryId: { type: [string, "null"], format: uuid }
+        directoryId: { type: [ string, "null" ], format: uuid }
         size: { type: integer, format: int64 }
         contentType: { type: string }
         checksum: { type: string, description: SHA-256 checksum in hexadecimal }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
+        additionalData:
+          $ref: "#/components/schemas/Metadata"
+          description: Arbitrary JSON metadata associated with the file.
     FileListResponse:
       type: object
-      required: [files, total]
+      required: [ files, total ]
       properties:
         files:
           type: array
           items: { $ref: "#/components/schemas/FileMetadata" }
         total: { type: integer, format: int64 }
-    UpdateFileRequest:
+    UpdateItemRequest:
       type: object
       minProperties: 1
       properties:
         name: { type: string, minLength: 1 }
         directoryId:
-          type: [string, "null"]
+          type: [ string, "null" ]
           format: uuid
           description: Null moves the item to root; omission leaves it unchanged.
+        additionalData:
+          $ref: "#/components/schemas/Metadata"
     CreateDirectoryRequest:
       type: object
-      required: [name]
+      required: [ name ]
       properties:
         name: { type: string, minLength: 1 }
-        parentId: { type: [string, "null"], format: uuid }
+        parentId: { type: [ string, "null" ], format: uuid }
     DirectoryMetadata:
       type: object
-      required: [id, name, createdAt]
+      required: [ id, name, createdAt ]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
-        parentId: { type: [string, "null"], format: uuid }
+        parentId: { type: [ string, "null" ], format: uuid }
         createdAt: { type: string, format: date-time }
+        additionalData:
+          $ref: "#/components/schemas/Metadata"
+          description: Arbitrary JSON metadata associated with the directory.
     StorageInfo:
       type: object
-      required: [totalBytes, usedBytes, freeBytes]
+      required: [ totalBytes, usedBytes, freeBytes ]
       properties:
         totalBytes: { type: integer, format: int64 }
         usedBytes: { type: integer, format: int64 }
         freeBytes: { type: integer, format: int64 }
     ErrorResponse:
       type: object
-      required: [title, status, detail]
+      required: [ title, status, detail ]
       properties:
         title: { type: string }
         status: { type: integer }
