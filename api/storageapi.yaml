@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Storage API
   version: 0.1.0
-  description: Mizar file storage service.
+  description: Fabric file storage service.
 servers:
   - url: /api/v1
 security:

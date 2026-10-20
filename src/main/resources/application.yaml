@@ -18,6 +18,6 @@ spring:
 
 cz:
   anderle:
-    mizar:
+    fabric:
       storage:
         disc-path: "C:/Users/Jakub Anderle/programy/oracle/storage/disc"

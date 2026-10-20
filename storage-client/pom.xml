@@ -8,7 +8,7 @@
         <version>4.1.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>cz.anderle.mizar</groupId>
+    <groupId>cz.anderle.fabric</groupId>
     <artifactId>storage.client</artifactId>
     <version>0.1.0</version>
     <name>storage-client</name>
@@ -18,7 +18,7 @@
         <java.version>25</java.version>
         <openapi-generator.version>7.26.0</openapi-generator.version>
         <client.apipath>../api/storageapi.yaml</client.apipath>
-        <client.package>cz.anderle.mizar.storage.client</client.package>
+        <client.package>cz.anderle.fabric.storage.client</client.package>
     </properties>
     <dependencies>
         <dependency>
@@ -52,9 +52,11 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
+<!--                            <apiNameSuffix>Test</apiNameSuffix>-->
                             <inputSpec>${client.apipath}</inputSpec>
                             <generatorName>java</generatorName>
                             <configOptions>
+                                <apiClientName>${client.name}</apiClientName>
                                 <library>restclient</library>
                                 <openApiNullable>false</openApiNullable>
                                 <useJakartaEe>true</useJakartaEe>

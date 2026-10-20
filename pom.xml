@@ -8,7 +8,7 @@
 		<version>4.1.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>cz.anderle.mizar</groupId>
+	<groupId>cz.anderle.fabric</groupId>
 	<artifactId>storage</artifactId>
 	<version>0.1.0</version>
 
@@ -17,13 +17,13 @@
 		<openapi-generator.version>7.26.0</openapi-generator.version>
 
 		<jooq.url>localhost:5432/storage</jooq.url>
-		<jooq.package>cz.anderle.mizar.storage.jooq</jooq.package>
+		<jooq.package>cz.anderle.fabric.storage.jooq</jooq.package>
 		<jooq.schema>public</jooq.schema>
 		<jooq.user>storage</jooq.user>
 		<jooq.password>storage</jooq.password>
 
 		<api.path>api/storageapi.yaml</api.path>
-		<api.package>cz.anderle.mizar.storage.api</api.package>
+		<api.package>cz.anderle.fabric.storage.api</api.package>
 	</properties>
 	<dependencies>
 		<dependency>

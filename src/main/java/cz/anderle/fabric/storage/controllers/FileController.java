@@ -1,10 +1,10 @@
-package cz.anderle.mizar.storage.controllers;
+package cz.anderle.fabric.storage.controllers;
 
-import cz.anderle.mizar.storage.api.FileApi;
-import cz.anderle.mizar.storage.api.model.FileListResponse;
-import cz.anderle.mizar.storage.api.model.FileMetadata;
-import cz.anderle.mizar.storage.api.model.UpdateItemRequest;
-import cz.anderle.mizar.storage.services.FileService;
+import cz.anderle.fabric.storage.api.FileApi;
+import cz.anderle.fabric.storage.api.model.FileListResponse;
+import cz.anderle.fabric.storage.api.model.FileMetadata;
+import cz.anderle.fabric.storage.api.model.UpdateItemRequest;
+import cz.anderle.fabric.storage.services.FileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,7 +1,7 @@
-package cz.anderle.mizar.storage.controllers;
+package cz.anderle.fabric.storage.controllers;
 
-import cz.anderle.mizar.storage.api.StorageApi;
-import cz.anderle.mizar.storage.api.model.StorageInfo;
+import cz.anderle.fabric.storage.api.StorageApi;
+import cz.anderle.fabric.storage.api.model.StorageInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

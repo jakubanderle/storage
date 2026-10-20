@@ -1,6 +1,6 @@
-package cz.anderle.mizar.storage.services;
+package cz.anderle.fabric.storage.services;
 
-import cz.anderle.mizar.storage.config.StorageProperties;
+import cz.anderle.fabric.storage.config.StorageProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

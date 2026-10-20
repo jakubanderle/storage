@@ -1,9 +1,9 @@
-package cz.anderle.mizar.storage.controllers;
+package cz.anderle.fabric.storage.controllers;
 
-import cz.anderle.mizar.storage.api.DirectoryApi;
-import cz.anderle.mizar.storage.api.model.CreateDirectoryRequest;
-import cz.anderle.mizar.storage.api.model.DirectoryMetadata;
-import cz.anderle.mizar.storage.api.model.UpdateItemRequest;
+import cz.anderle.fabric.storage.api.DirectoryApi;
+import cz.anderle.fabric.storage.api.model.CreateDirectoryRequest;
+import cz.anderle.fabric.storage.api.model.DirectoryMetadata;
+import cz.anderle.fabric.storage.api.model.UpdateItemRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
